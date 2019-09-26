@@ -1,5 +1,5 @@
 stages:
-  - publish-master
+  - publish
 
 variables:
   SBT_OPTS: "-Dsbt.global.base=sbt-cache/.sbtboot -Dsbt.boot.directory=sbt-cache/.boot -Dsbt.ivy.home=sbt-cache/.ivy"
@@ -15,7 +15,7 @@ cache:
 
 
 publish-master:
-  stage: assembly
+  stage: publish
   image: openjdk:11
   before_script:
     - apt-get update -yqq
