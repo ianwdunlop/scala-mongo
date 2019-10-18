@@ -11,7 +11,6 @@ lazy val root = (project in file(".")).
     organization        := "io.mdcatapult.klein",
     scalaVersion        := Scala212,
     crossScalaVersions  := Scala212 :: Scala211 :: Scala210 :: Nil,
-    version             := "0.0.3",
     scalacOptions += "-Ypartial-unification",
     resolvers         ++= Seq(
       "MDC Nexus Releases" at "http://nexus.mdcatapult.io/repository/maven-releases/",
