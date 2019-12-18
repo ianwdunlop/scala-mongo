@@ -27,7 +27,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     .codecRegistry(codecs)
 
   def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder =
-    if (config.getBoolean("mongo.connection.tls.enabled")) {
+    if (config.hasPath("mongo.connection.tls.enabled") && config.getBoolean("mongo.connection.tls.enabled")) {
       builder.streamFactoryFactory(NettyStreamFactoryFactory())
              .applyToSslSettings(b => b.enabled(true))
     } else {
