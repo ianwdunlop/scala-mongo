@@ -1,7 +1,7 @@
 package io.mdcatapult.klein.mongo
 
 import java.util
-
+import org.mongodb.scala.connection.NettyStreamFactoryFactory
 import com.mongodb.MongoClientSettings
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
@@ -16,7 +16,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     config.getString("mongo.connection.password").toCharArray
   )
 
-  val settings: MongoClientSettings = MongoClientSettings.builder()
+  val builder: MongoClientSettings.Builder = MongoClientSettings.builder()
     .credential(credential)
     .applyToClusterSettings(b => b.hosts(
       (
@@ -25,9 +25,17 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
         ).asJava
     ))
     .codecRegistry(codecs)
-    .build()
+
+  def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder =
+    if (config.getBoolean("mongo.connection.tls.enabled")) {
+      builder.streamFactoryFactory(NettyStreamFactoryFactory())
+             .applyToSslSettings(b => b.enabled(true))
+    } else {
+      builder
+    }
 
 
+  val settings: MongoClientSettings = applySslSettings(builder).build()
   val mongoClient: MongoClient = MongoClient(settings)
   val database: MongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"))
   val collection: MongoCollection[Document] = database.getCollection(config.getString("mongo.collection"))
