@@ -16,7 +16,7 @@ cache:
 
 before_script:
   - apt update -yqq
-  - apt install -yqq apt-transport-https ca-certificates
+  - apt install -yqq apt-transport-https ca-certificates gnupg
   - echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
   - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
   - apt update -yqq
@@ -29,7 +29,7 @@ test:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:14
+  image: openjdk:14-slim
   script:
     - sbt clean coverage test coverageReport coverageOff
 
@@ -38,7 +38,7 @@ publish-snapshot:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:14
+  image: openjdk:14-slim
   script:
     - sbt publish
   only:
@@ -49,10 +49,10 @@ release-master:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:14
+  image: openjdk:14-slim
   before_script:
     - apt update -yqq
-    - apt install -yqq apt-transport-https ca-certificates
+    - apt install -yqq apt-transport-https ca-certificates gnupg
     - echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
     - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
     - apt update -yqq
