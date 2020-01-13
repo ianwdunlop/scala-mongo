@@ -1,13 +1,12 @@
 package io.mdcatapult.klein.mongo
 
-import java.util
-import org.mongodb.scala.connection.NettyStreamFactoryFactory
 import com.mongodb.MongoClientSettings
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
+import org.mongodb.scala.connection.NettyStreamFactoryFactory
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY) {
   val credential: MongoCredential = MongoCredential.createCredential(
@@ -20,7 +19,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     .credential(credential)
     .applyToClusterSettings(b => b.hosts(
       (
-        for (host: String ← config.getStringList("mongo.connection.hosts").asScala.toList)
+        for (host: String <- config.getStringList("mongo.connection.hosts").asScala.toList)
           yield new ServerAddress(host)
         ).asJava
     ))
@@ -41,7 +40,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
   val collection: MongoCollection[Document] = database.getCollection(config.getString("mongo.collection"))
 
   def getCollection(collectionName: Option[String] = None): MongoCollection[Document] = collectionName match {
-    case Some(name: String) ⇒ database.getCollection(name)
-    case None ⇒ collection
+    case Some(name: String) => database.getCollection(name)
+    case None => collection
   }
 }
