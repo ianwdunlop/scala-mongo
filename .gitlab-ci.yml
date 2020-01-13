@@ -29,7 +29,7 @@ test:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:11
+  image: openjdk:14
   script:
     - sbt clean coverage test coverageReport coverageOff
 
@@ -38,7 +38,7 @@ publish-snapshot:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:11
+  image: openjdk:14
   script:
     - sbt publish
   only:
@@ -49,7 +49,7 @@ release-master:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-  image: openjdk:11
+  image: openjdk:14
   before_script:
     - apt-get update -yqq
     - apt-get install -yqq apt-transport-https ca-certificates
