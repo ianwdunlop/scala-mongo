@@ -18,8 +18,8 @@ lazy val root = (project in file(".")).
       "-feature",
       "-Xlint"),
     resolvers         ++= Seq(
-      "MDC Nexus Releases" at "http://nexus.mdcatapult.io/repository/maven-releases/",
-      "MDC Nexus Snapshots" at "http://nexus.mdcatapult.io/repository/maven-snapshots/"),
+      "MDC Nexus Releases" at "https://nexus.mdcatapult.io/repository/maven-releases/",
+      "MDC Nexus Snapshots" at "https://nexus.mdcatapult.io/repository/maven-snapshots/"),
     credentials       += {
       val nexusPassword = sys.env.get("NEXUS_PASSWORD")
       if ( nexusPassword.nonEmpty ) {
