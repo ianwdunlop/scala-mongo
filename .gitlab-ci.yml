@@ -58,7 +58,7 @@ release-master:
     - apt-get update -yqq
     - apt-get install -yqq sbt
     - sbt sbtVersion
-    - 'which ssh-agent || ( apt install -qq openssh-client )'
+    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
@@ -72,7 +72,7 @@ release-master:
     - export PREVIOUS_TAG=$(git describe --tags --abbrev=0)
     - export GIT_LOG=$(echo "$(git log $PREVIOUS_TAG..HEAD --oneline --no-merges)" | awk -v ORS='  \\n' '1')
     - sbt "release with-defaults"
-    - export RELEASE_TAG=$(git describe --abbrev=0)
+    - export RELEASE_TAG=$(git describe --tags --abbrev=0)
     - >
       curl --header 'Content-Type: application/json'
       --header "PRIVATE-TOKEN: $GIT_RELEASE_TOKEN"
