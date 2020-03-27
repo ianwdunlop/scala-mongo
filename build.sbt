@@ -1,20 +1,25 @@
-lazy val Scala212 = "2.12.8"
-lazy val Scala211 = "2.11.12"
-lazy val Scala210 = "2.10.7"
+lazy val scala_2_13 = "2.13.1"
+lazy val scala_2_12 = "2.12.10"
 
-lazy val mongoVersion = "2.6.0"
-lazy val configVersion = "1.3.2"
+lazy val mongoVersion = "2.8.0"
+lazy val configVersion = "1.4.0"
 
 lazy val root = (project in file(".")).
   settings(
     name                := "mongo",
     organization        := "io.mdcatapult.klein",
-    scalaVersion        := Scala212,
-    crossScalaVersions  := Scala212 :: Scala211 :: Scala210 :: Nil,
-    scalacOptions += "-Ypartial-unification",
+    scalaVersion        := scala_2_13,
+    crossScalaVersions  := scala_2_13 :: scala_2_12 :: Nil,
+    scalacOptions ++= Seq(
+      "-encoding", "utf-8",
+      "-unchecked",
+      "-deprecation",
+      "-explaintypes",
+      "-feature",
+      "-Xlint"),
     resolvers         ++= Seq(
-      "MDC Nexus Releases" at "http://nexus.mdcatapult.io/repository/maven-releases/",
-      "MDC Nexus Snapshots" at "http://nexus.mdcatapult.io/repository/maven-snapshots/"),
+      "MDC Nexus Releases" at "https://nexus.mdcatapult.io/repository/maven-releases/",
+      "MDC Nexus Snapshots" at "https://nexus.mdcatapult.io/repository/maven-snapshots/"),
     credentials       += {
       val nexusPassword = sys.env.get("NEXUS_PASSWORD")
       if ( nexusPassword.nonEmpty ) {
@@ -24,10 +29,11 @@ lazy val root = (project in file(".")).
       }
     },
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest"                  % "3.0.3" % Test,
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3",
+      "org.scalatest" %% "scalatest"                  % "3.1.0" % Test,
       "org.mongodb.scala" %% "mongo-scala-driver"     % mongoVersion,
       "ch.qos.logback" % "logback-classic"            % "1.2.3",
-      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "com.typesafe" % "config"                       % configVersion,
     )
   ).
@@ -36,11 +42,8 @@ lazy val root = (project in file(".")).
   )
 lazy val publishSettings = Seq(
   publishTo := {
-    if (isSnapshot.value)
-      Some("MDC Maven Repo" at "https://nexus.mdcatapult.io/repository/maven-snapshots/")
-    else
-      Some("MDC Maven Repo" at "https://nexus.mdcatapult.io/repository/maven-releases/")
+    val version = if (isSnapshot.value) "snapshots" else "releases"
+    Some("MDC Maven Repo" at s"https://nexus.mdcatapult.io/repository/maven-$version/")
   },
   credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 )
-
