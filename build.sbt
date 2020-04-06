@@ -21,16 +21,16 @@ lazy val root = (project in file(".")).
       "MDC Nexus Releases" at "https://nexus.mdcatapult.io/repository/maven-releases/",
       "MDC Nexus Snapshots" at "https://nexus.mdcatapult.io/repository/maven-snapshots/"),
     credentials       += {
-      val nexusPassword = sys.env.get("NEXUS_PASSWORD")
-      if ( nexusPassword.nonEmpty ) {
-        Credentials("Sonatype Nexus Repository Manager", "nexus.mdcatapult.io", "gitlab", nexusPassword.get)
-      } else {
-        Credentials(Path.userHome / ".sbt" / ".credentials")
+      sys.env.get("NEXUS_PASSWORD") match {
+        case Some(p) =>
+          Credentials("Sonatype Nexus Repository Manager", "nexus.mdcatapult.io", "gitlab", p)
+        case None =>
+          Credentials(Path.userHome / ".sbt" / ".credentials")
       }
     },
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3",
-      "org.scalatest" %% "scalatest"                  % "3.1.0" % Test,
+      "org.scalatest" %% "scalatest"                  % "3.1.1" % Test,
       "org.mongodb.scala" %% "mongo-scala-driver"     % mongoVersion,
       "ch.qos.logback" % "logback-classic"            % "1.2.3",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
