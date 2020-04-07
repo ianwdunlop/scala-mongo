@@ -29,7 +29,7 @@ lazy val root = (project in file(".")).
       }
     },
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.4",
       "org.scalatest" %% "scalatest"                  % "3.1.1" % Test,
       "org.mongodb.scala" %% "mongo-scala-driver"     % mongoVersion,
       "ch.qos.logback" % "logback-classic"            % "1.2.3",
