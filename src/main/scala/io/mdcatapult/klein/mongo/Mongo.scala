@@ -19,20 +19,22 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     .credential(credential)
     .applyToClusterSettings(b => b.hosts(
       (
-        for (host: String <- config.getStringList("mongo.connection.hosts").asScala.toList)
+        for (host <- config.getStringList("mongo.connection.hosts").asScala.toList)
           yield new ServerAddress(host)
         ).asJava
     ))
     .codecRegistry(codecs)
 
-  def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder =
-    if (config.hasPath("mongo.connection.tls.enabled") && config.getBoolean("mongo.connection.tls.enabled")) {
+  def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder = {
+    val enableFlag = "mongo.connection.tls.enabled"
+    val isEnabled = config.hasPath(enableFlag) && config.getBoolean(enableFlag)
+
+    if (isEnabled)
       builder.streamFactoryFactory(NettyStreamFactoryFactory())
              .applyToSslSettings(b => b.enabled(true))
-    } else {
+    else
       builder
-    }
-
+  }
 
   val settings: MongoClientSettings = applySslSettings(builder).build()
   val mongoClient: MongoClient = MongoClient(settings)

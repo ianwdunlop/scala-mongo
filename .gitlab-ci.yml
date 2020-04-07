@@ -30,7 +30,7 @@ test:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
   image: openjdk:14-slim
   script:
-    - sbt clean coverage test coverageReport coverageOff
+    - sbt +clean coverage +test coverageReport coverageOff
 
 publish-snapshot:
   stage: publish
