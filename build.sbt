@@ -35,6 +35,7 @@ lazy val root = (project in file(".")).
       "ch.qos.logback" % "logback-classic"            % "1.2.3",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "com.typesafe" % "config"                       % configVersion,
+      "io.netty" % "netty-all" % "4.1.48.Final",
     )
   ).
   settings(
