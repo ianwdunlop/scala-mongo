@@ -1,7 +1,7 @@
 lazy val scala_2_13 = "2.13.1"
 lazy val scala_2_12 = "2.12.10"
 
-lazy val mongoVersion = "2.8.0"
+lazy val mongoVersion = "4.0.2"
 lazy val configVersion = "1.4.0"
 
 lazy val root = (project in file(".")).
@@ -16,7 +16,9 @@ lazy val root = (project in file(".")).
       "-deprecation",
       "-explaintypes",
       "-feature",
-      "-Xlint"),
+      "-Xlint",
+      "-Xfatal-warnings"),
+    useCoursier := false,
     resolvers         ++= Seq(
       "MDC Nexus Releases" at "https://nexus.mdcatapult.io/repository/maven-releases/",
       "MDC Nexus Snapshots" at "https://nexus.mdcatapult.io/repository/maven-snapshots/"),
