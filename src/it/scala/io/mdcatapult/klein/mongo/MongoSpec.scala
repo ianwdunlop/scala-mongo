@@ -15,9 +15,11 @@ import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.model.Filters.{equal => Mequal}
 import org.scalatest.OptionValues._
+import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Seconds, Span}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -43,7 +45,7 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     val written = collection.insertOne(doc).toFutureOption()
     val read = written.flatMap(_ => collection.find(Mequal("_id", doc._id)).toFuture())
 
-    whenReady(read) { docs =>
+    whenReady(read, Timeout(Span(10, Seconds))) { docs =>
       val storedDoc = docs.headOption.value
 
       storedDoc._id should be(doc._id)
