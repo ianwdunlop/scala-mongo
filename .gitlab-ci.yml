@@ -33,8 +33,9 @@ test:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-      - MONGO_HOST=mongo
   image: openjdk:14-slim
+  variables:
+    MONGO_HOST: mongo
   script:
     - sbt +clean coverage +it:test coverageReport
 
