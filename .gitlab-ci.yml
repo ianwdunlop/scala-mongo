@@ -1,3 +1,8 @@
+services:
+  - docker:dind
+  - name: mongo:4.2
+    alias: mongo
+
 stages:
   - test
   - publish
@@ -28,9 +33,10 @@ test:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
+      - MONGO_HOST=mongo
   image: openjdk:14-slim
   script:
-    - sbt +clean coverage +test coverageReport coverageOff
+    - sbt +clean coverage +it:test coverageReport
 
 publish-snapshot:
   stage: publish
