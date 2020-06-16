@@ -43,12 +43,6 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     val written = collection.insertOne(doc).toFutureOption()
     val read = written.flatMap(_ => collection.find(Mequal("_id", doc._id)).toFuture())
 
-    read.recover {
-      case e: Exception =>
-        e.printStackTrace()
-        fail(e.toString)
-    }
-
     whenReady(read) { docs =>
       val storedDoc = docs.headOption.value
 
