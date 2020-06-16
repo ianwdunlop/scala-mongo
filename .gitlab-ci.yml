@@ -1,5 +1,4 @@
 services:
-  - docker:dind
   - name: mongo:4.2
     alias: mongo
 
@@ -23,7 +22,7 @@ cache:
 
 before_script:
   - apt-get update -yqq
-  - apt-get install -yqq apt-transport-https ca-certificates curl gnupg
+  - apt-get install -yqq apt-transport-https ca-certificates gnupg
   - echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
   - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
   - apt-get update -yqq
@@ -32,9 +31,6 @@ before_script:
 
 test:
   stage: test
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
   image: openjdk:14-slim
   variables:
     MONGO_HOST: mongo
@@ -42,6 +38,13 @@ test:
     MONGO_PASSWORD: admin
   script:
     - sbt +clean coverage +it:test coverageReport
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - target/scala-2.13/scoverage-report/
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
 
 publish-snapshot:
   stage: publish
