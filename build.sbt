@@ -1,15 +1,18 @@
-lazy val scala_2_13 = "2.13.1"
-lazy val scala_2_12 = "2.12.10"
+lazy val scala_2_13 = "2.13.2"
 
 lazy val mongoVersion = "4.0.2"
 lazy val configVersion = "1.4.0"
 
-lazy val root = (project in file(".")).
-  settings(
+lazy val IntegrationTest = config("it") extend Test
+
+lazy val root = (project in file("."))
+  .configs(IntegrationTest)
+  .settings(
+    Defaults.itSettings,
     name                := "mongo",
     organization        := "io.mdcatapult.klein",
     scalaVersion        := scala_2_13,
-    crossScalaVersions  := scala_2_13 :: scala_2_12 :: Nil,
+    crossScalaVersions  := scala_2_13 :: Nil,
     scalacOptions ++= Seq(
       "-encoding", "utf-8",
       "-unchecked",
