@@ -25,6 +25,8 @@ default:
 
 test:
   stage: test
+  tags:
+    - wopr
   variables:
     MONGO_HOST: mongo
     MONGO_USERNAME: admin
@@ -41,6 +43,8 @@ test:
 
 publish-snapshot:
   stage: publish
+  tags:
+    - wopr
   script:
     - sbt +publish
   only:
@@ -51,6 +55,8 @@ publish-snapshot:
 
 publish-master:
   stage: publish
+  tags:
+    - wopr
   script:
     - sbt +publish
   only:
@@ -61,6 +67,8 @@ publish-master:
 
 release-master:
   stage: publish
+  tags:
+    - wopr
   script:
     - /scripts/release.sh -b -r develop
   only:
