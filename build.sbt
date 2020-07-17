@@ -1,4 +1,4 @@
-lazy val scala_2_13 = "2.13.2"
+lazy val scala_2_13 = "2.13.3"
 
 lazy val mongoVersion = "4.0.2"
 lazy val configVersion = "1.4.0"
@@ -34,6 +34,8 @@ lazy val root = (project in file("."))
       }
     },
     libraryDependencies ++= Seq(
+      "io.mdcatapult.klein" %% "util"                 % "1.1.0",
+
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.4",
       "org.scalatest" %% "scalatest"                  % "3.1.1" % Test,
       "org.mongodb.scala" %% "mongo-scala-driver"     % mongoVersion,

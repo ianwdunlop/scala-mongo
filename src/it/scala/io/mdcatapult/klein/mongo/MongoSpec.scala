@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit.MILLIS
 import java.util.UUID.randomUUID
 
 import com.typesafe.config.{Config, ConfigFactory}
+import io.mdcatapult.klein.mongo.ResultConverters.toInsertionResult
 import org.bson.UuidRepresentation
 import org.bson.codecs.UuidCodec
 import org.bson.codecs.configuration.CodecRegistries.{fromCodecs, fromProviders, fromRegistries}
@@ -42,8 +43,13 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
 
     val doc = TestDoc(randomUUID(), now(UTC))
 
-    val written = collection.insertOne(doc).toFutureOption()
+    val written = collection.insertOne(doc).toFuture().map(toInsertionResult)
     val read = written.flatMap(_ => collection.find(Mequal("_id", doc._id)).toFuture())
+
+    whenReady(written, Timeout(Span(10, Seconds))) { r =>
+      r.acknowledged should be (true)
+      r.insertedCount should be (1L)
+    }
 
     whenReady(read, Timeout(Span(10, Seconds))) { docs =>
       val storedDoc = docs.headOption.value
