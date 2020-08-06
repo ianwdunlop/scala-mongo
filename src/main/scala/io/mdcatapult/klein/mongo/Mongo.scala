@@ -15,11 +15,19 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     config.getString("mongo.connection.password").toCharArray
   )
 
+  val hosts: List[String] = {
+    val configured = config.getStringList("mongo.connection.hosts").asScala.toList
+    if (configured.nonEmpty)
+      configured
+    else
+      List("localhost")
+  }
+
   val builder: MongoClientSettings.Builder = MongoClientSettings.builder()
     .credential(credential)
     .applyToClusterSettings(b => b.hosts(
       (
-        for (host <- config.getStringList("mongo.connection.hosts").asScala.toList)
+        for (host <- hosts)
           yield new ServerAddress(host)
         ).asJava
     ))
