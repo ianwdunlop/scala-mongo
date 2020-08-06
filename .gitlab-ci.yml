@@ -33,13 +33,7 @@ test:
     MONGO_PASSWORD: admin
   script:
     - sbt +clean coverage +it:test coverageReport
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - target/scala-2.13/scoverage-report/
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
+  coverage: /Coverage was \[\d+.\d+\%\]/
 
 publish-snapshot:
   stage: publish
