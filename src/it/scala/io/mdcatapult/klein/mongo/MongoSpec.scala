@@ -57,5 +57,7 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
       storedDoc._id should be(doc._id)
       storedDoc.created.truncatedTo(MILLIS) should be (doc.created.truncatedTo(MILLIS))
     }
+
+    mongo.checkHealth() should be (true)
   }
 }

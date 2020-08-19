@@ -6,9 +6,11 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
 import org.mongodb.scala.connection.NettyStreamFactoryFactory
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.CollectionConverters._
 
-class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY) {
+class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY, ec: ExecutionContext) {
   val credential: MongoCredential = MongoCredential.createCredential(
     config.getString("mongo.connection.username"),
     config.getString("mongo.connection.database"),
@@ -52,5 +54,15 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
   def getCollection(collectionName: Option[String] = None): MongoCollection[Document] = collectionName match {
     case Some(name: String) => database.getCollection(name)
     case None => collection
+  }
+
+  def checkHealth(): Boolean = {
+    val f = mongoClient.listDatabaseNames().toFuture().map(_ => true).recover{case _ => false}
+    try {
+      Await.result(f, Duration("10s"))
+    } catch {
+      case e: Throwable =>
+        false
+    }
   }
 }
