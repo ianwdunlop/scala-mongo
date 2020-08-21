@@ -6,8 +6,7 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
 import org.mongodb.scala.connection.NettyStreamFactoryFactory
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
 class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY, ec: ExecutionContext) {
@@ -56,13 +55,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     case None => collection
   }
 
-  def checkHealth(): Boolean = {
-    val f = mongoClient.listDatabaseNames().toFuture().map(_ => true).recover{case _ => false}
-    try {
-      Await.result(f, Duration("10s"))
-    } catch {
-      case e: Throwable =>
-        false
-    }
+  def checkHealth(): Future[Boolean] = {
+    mongoClient.listDatabaseNames().toFuture().map(_ => true).recover{case _ => false}
   }
 }

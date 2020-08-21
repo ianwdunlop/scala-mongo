@@ -26,15 +26,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
 
-  "Mongo" should "write test document when configured" in {
-    implicit val c: Config = ConfigFactory.load()
-    implicit val r: CodecRegistry = fromRegistries(
-      fromProviders(classOf[TestDoc]),
-      fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
-      DEFAULT_CODEC_REGISTRY
-    )
+  implicit val c: Config = ConfigFactory.load()
+  implicit val r: CodecRegistry = fromRegistries(
+    fromProviders(classOf[TestDoc]),
+    fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
+    DEFAULT_CODEC_REGISTRY
+  )
 
-    val mongo: Mongo = new Mongo()
+  val mongo: Mongo = new Mongo()
+
+  "Mongo" should "write test document when configured" in {
 
     implicit val collection: MongoCollection[TestDoc] =
       mongo.database.getCollection(
@@ -57,7 +58,11 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
       storedDoc._id should be(doc._id)
       storedDoc.created.truncatedTo(MILLIS) should be (doc.created.truncatedTo(MILLIS))
     }
+  }
 
-    mongo.checkHealth() should be (true)
+  "Mongo" should "be healthy" in {
+    whenReady(mongo.checkHealth(), Timeout(Span(10, Seconds))) { result =>
+      result should be (true)
+    }
   }
 }
