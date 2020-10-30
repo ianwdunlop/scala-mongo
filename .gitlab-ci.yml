@@ -52,18 +52,6 @@ publish-master:
   tags:
     - wopr
   script:
-    - sbt +publish
-  only:
-    refs:
-      - tags
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
-
-release-master:
-  stage: publish
-  tags:
-    - wopr
-  script:
     - /scripts/release.sh -b -r develop
   only:
     - master

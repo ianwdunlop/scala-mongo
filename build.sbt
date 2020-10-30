@@ -1,6 +1,6 @@
 lazy val scala_2_13 = "2.13.3"
 
-lazy val mongoVersion = "4.0.2"
+lazy val mongoVersion = "4.1.1"
 lazy val configVersion = "1.4.0"
 
 lazy val IntegrationTest = config("it") extend Test
