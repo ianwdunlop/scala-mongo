@@ -38,7 +38,8 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
   "Mongo" should "write test document when configured" in {
 
     implicit val collection: MongoCollection[TestDoc] =
-      mongo.database.getCollection(
+      mongo.getCollection[TestDoc](
+        c.getString("mongo.database"),
         c.getString("mongo.collection")
       )
 
