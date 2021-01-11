@@ -8,6 +8,7 @@ import org.mongodb.scala.connection.NettyStreamFactoryFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
+import scala.reflect.ClassTag
 
 class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY, ec: ExecutionContext) {
   val credential: MongoCredential = MongoCredential.createCredential(
@@ -52,8 +53,8 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     mongoClient.getDatabase(databaseName)
   }
 
-  def getCollection(databaseName: String, collectionName: String): MongoCollection[Any] = {
-    mongoClient.getDatabase(databaseName).getCollection(collectionName)
+  def getCollection[T:ClassTag](databaseName: String, collectionName: String): MongoCollection[T] = {
+    mongoClient.getDatabase(databaseName).getCollection[T](collectionName)
   }
 
   def checkHealth(): Future[Boolean] = {
