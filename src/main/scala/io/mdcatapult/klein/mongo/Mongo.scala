@@ -8,6 +8,7 @@ import org.mongodb.scala.connection.NettyStreamFactoryFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
+import scala.reflect.ClassTag
 
 class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY, ec: ExecutionContext) {
   val credential: MongoCredential = MongoCredential.createCredential(
@@ -47,12 +48,13 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
   val settings: MongoClientSettings = applySslSettings(builder).build()
   val mongoClient: MongoClient = MongoClient(settings)
-  val database: MongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"))
-  val collection: MongoCollection[Document] = database.getCollection(config.getString("mongo.collection"))
 
-  def getCollection(collectionName: Option[String] = None): MongoCollection[Document] = collectionName match {
-    case Some(name: String) => database.getCollection(name)
-    case None => collection
+  def getDatabase(databaseName: String): MongoDatabase = {
+    mongoClient.getDatabase(databaseName)
+  }
+
+  def getCollection[T:ClassTag](databaseName: String, collectionName: String): MongoCollection[T] = {
+    mongoClient.getDatabase(databaseName).getCollection[T](collectionName)
   }
 
   def checkHealth(): Future[Boolean] = {
