@@ -47,12 +47,13 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
   val settings: MongoClientSettings = applySslSettings(builder).build()
   val mongoClient: MongoClient = MongoClient(settings)
-  val database: MongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"))
-  val collection: MongoCollection[Document] = database.getCollection(config.getString("mongo.collection"))
 
-  def getCollection(collectionName: Option[String] = None): MongoCollection[Document] = collectionName match {
-    case Some(name: String) => database.getCollection(name)
-    case None => collection
+  def getDatabase(databaseName: String): MongoDatabase = {
+    mongoClient.getDatabase(databaseName)
+  }
+
+  def getCollection(databaseName: String, collectionName: String): MongoCollection[Any] = {
+    mongoClient.getDatabase(databaseName).getCollection(collectionName)
   }
 
   def checkHealth(): Future[Boolean] = {
