@@ -4,7 +4,7 @@ import com.mongodb.MongoClientSettings
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
-import org.mongodb.scala.connection.NettyStreamFactoryFactory
+import org.mongodb.scala.connection.{ClusterSettings, NettyStreamFactoryFactory}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
@@ -17,22 +17,18 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     config.getString("mongo.connection.password").toCharArray
   )
 
-  val hosts: List[String] = {
-    val configured = config.getStringList("mongo.connection.hosts").asScala.toList
-    if (configured.nonEmpty)
-      configured
-    else
-      List("localhost")
-  }
+  val hosts: List[String] = config.getString("mongo.connection.host").split(",").toList
 
-  val builder: MongoClientSettings.Builder = MongoClientSettings.builder()
+  private val builder = MongoClientSettings.builder()
     .credential(credential)
-    .applyToClusterSettings(b => b.hosts(
-      (
-        for (host <- hosts)
-          yield new ServerAddress(host)
-        ).asJava
-    ))
+    .applyToClusterSettings(
+      (builder: ClusterSettings.Builder) => {
+        if (config.getBoolean("mongo.connection.srv"))
+          builder.srvHost(hosts.head)
+        else
+          builder.hosts((for (host <- hosts)
+            yield new ServerAddress(host, config.getInt("mongo.connection.port"))).asJava)
+      })
     .codecRegistry(codecs)
 
   def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder = {
@@ -41,7 +37,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
     if (isEnabled)
       builder.streamFactoryFactory(NettyStreamFactoryFactory())
-             .applyToSslSettings(b => b.enabled(true))
+        .applyToSslSettings(b => b.enabled(true))
     else
       builder
   }

@@ -39,8 +39,8 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
 
     implicit val collection: MongoCollection[TestDoc] =
       mongo.getCollection[TestDoc](
-        c.getString("mongo.database"),
-        c.getString("mongo.collection")
+        "test",
+        "test-coll"
       )
 
     val doc = TestDoc(randomUUID(), now(UTC))
