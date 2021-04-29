@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
       }
     },
     libraryDependencies ++= Seq(
-      "io.mdcatapult.klein" %% "util"                 % "1.2.2",
+      "io.mdcatapult.klein" %% "util"                 % "1.2.3",
 
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.4",
       "org.scalatest" %% "scalatest"                  % "3.1.1" % Test,
