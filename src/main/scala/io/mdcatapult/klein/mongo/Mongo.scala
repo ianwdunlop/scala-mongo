@@ -1,6 +1,6 @@
 package io.mdcatapult.klein.mongo
 
-import com.mongodb.MongoClientSettings
+import com.mongodb.{MongoClientSettings, ReadPreference}
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
@@ -29,6 +29,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
           builder.hosts((for (host <- hosts)
             yield new ServerAddress(host, config.getInt("mongo.connection.port"))).asJava)
       })
+    .readPreference(ReadPreference.secondaryPreferred())
     .codecRegistry(codecs)
 
   def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder = {
