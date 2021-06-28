@@ -1,6 +1,6 @@
 package io.mdcatapult.klein.mongo
 
-import com.mongodb.MongoClientSettings
+import com.mongodb.{MongoClientSettings, ReadPreference}
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
@@ -9,6 +9,7 @@ import org.mongodb.scala.connection.{ClusterSettings, NettyStreamFactoryFactory}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
+import scala.util.Try
 
 class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAULT_CODEC_REGISTRY, ec: ExecutionContext) {
   val credential: MongoCredential = MongoCredential.createCredential(
@@ -29,6 +30,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
           builder.hosts((for (host <- hosts)
             yield new ServerAddress(host, config.getInt("mongo.connection.port"))).asJava)
       })
+    .readPreference(ReadPreference.valueOf(Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred")))
     .codecRegistry(codecs)
 
   def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder = {
