@@ -24,7 +24,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
   // By default it uses secondary with replication lag less than 2 seconds
   val readPreference: ReadPreference = Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred") match {
     case "secondaryPreferred" => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(2), TimeUnit.SECONDS)
-    case _ => ReadPreference.primaryPreferred()
+    case "primaryPreferred" => ReadPreference.primaryPreferred()
   }
   private val builder = MongoClientSettings.builder()
     .credential(credential)
