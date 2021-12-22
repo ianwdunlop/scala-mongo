@@ -28,7 +28,7 @@ class MongoDefaultsSpec extends AnyFlatSpec with Matchers with ScalaFutures {
        |  }
        |}
     """.stripMargin)
-  
+
   implicit val r: CodecRegistry = fromRegistries(
     fromProviders(classOf[TestDoc]),
     fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
