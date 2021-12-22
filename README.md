@@ -11,6 +11,10 @@ Any codecs must be declared implicitly.
 
 The config from which connection details are pulled must be declared implicitly.
 
+## Config
+The default is to read from the secondary set via `mongo.connnection.readPreference` with default replication lag of 2 seconds in `mongo.connection.maxStaleness`.
+You can change `mongo.connnection.readPreference` to primaryPreferred if you want which then ignores the staleness setting.
+
 
 ## Testing
 ```bash
