@@ -46,4 +46,26 @@ class MongoDefaultsSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     val doc = mongo.readPreference.toDocument
     doc.getInt64("maxStalenessSeconds").asInt64().getValue should be(2)
   }
+
+  "Mongo" should "use secondary if readPreference config specified wrong " in {
+    implicit val config: Config = ConfigFactory.parseString(
+      s"""
+         |mongo {
+         |  connection {
+         |    host = "localhost"
+         |    port = 27017
+         |    username = "doclib"
+         |    password = "doclib"
+         |    database = "admin"
+         |    srv = false
+         |    readPreference = "primaryPlease"
+         |    maxStaleness = 5
+         |  }
+         |}
+    """.stripMargin)
+    val mongo: Mongo = new Mongo()
+    val readPreference = mongo.readPreference.toDocument
+    readPreference.getString("mode").asString().getValue should be("secondaryPreferred")
+    readPreference.getInt64("maxStalenessSeconds").asInt64().getValue should be(5)
+  }
 }

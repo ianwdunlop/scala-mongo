@@ -25,6 +25,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
   val readPreference: ReadPreference = Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred") match {
     case "secondaryPreferred" => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(2), TimeUnit.SECONDS)
     case "primaryPreferred" => ReadPreference.primaryPreferred()
+    case _ => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(2), TimeUnit.SECONDS)
   }
   private val builder = MongoClientSettings.builder()
     .credential(credential)
