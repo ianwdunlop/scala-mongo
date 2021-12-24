@@ -66,4 +66,8 @@ class MongoSpec extends AnyFlatSpec with Matchers with ScalaFutures {
       result should be (true)
     }
   }
+  "Mongo" should "be using primary" in {
+      val doc = mongo.readPreference.toDocument
+      doc.getString("mode").asString().getValue should be ("primaryPreferred")
+  }
 }

@@ -6,6 +6,7 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
 import org.mongodb.scala.connection.{ClusterSettings, NettyStreamFactoryFactory}
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
@@ -20,6 +21,12 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
   val hosts: List[String] = config.getString("mongo.connection.host").split(",").toList
 
+  // By default it uses secondary with replication lag less than 2 seconds
+  val readPreference: ReadPreference = Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred") match {
+    case "secondaryPreferred" => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(2), TimeUnit.SECONDS)
+    case "primaryPreferred" => ReadPreference.primaryPreferred()
+    case _ => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(2), TimeUnit.SECONDS)
+  }
   private val builder = MongoClientSettings.builder()
     .credential(credential)
     .applyToClusterSettings(
@@ -30,7 +37,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
           builder.hosts((for (host <- hosts)
             yield new ServerAddress(host, config.getInt("mongo.connection.port"))).asJava)
       })
-    .readPreference(ReadPreference.valueOf(Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred")))
+    .readPreference(readPreference)
     .codecRegistry(codecs)
 
   def applySslSettings(builder: MongoClientSettings.Builder): MongoClientSettings.Builder = {
