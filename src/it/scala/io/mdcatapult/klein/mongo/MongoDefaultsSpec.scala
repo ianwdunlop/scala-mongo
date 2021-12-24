@@ -42,9 +42,9 @@ class MongoDefaultsSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     doc.getString("mode").asString().getValue should be("secondaryPreferred")
   }
 
-  "Mongo" should "have default max staleness 2" in {
+  "Mongo" should "have default max staleness 90" in {
     val doc = mongo.readPreference.toDocument
-    doc.getInt64("maxStalenessSeconds").asInt64().getValue should be(2)
+    doc.getInt64("maxStalenessSeconds").asInt64().getValue should be(90)
   }
 
   "Mongo" should "use secondary if readPreference config specified wrong " in {

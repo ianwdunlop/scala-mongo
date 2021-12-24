@@ -26,7 +26,7 @@ class MongoSecondarySpec extends AnyFlatSpec with Matchers with ScalaFutures {
        |    database = "admin"
        |    srv = false
        |    readPreference = "secondaryPreferred"
-       |    maxStaleness = 10
+       |    maxStaleness = 100
        |  }
        |}
     """.stripMargin).withFallback(ConfigFactory.load())
@@ -44,8 +44,8 @@ class MongoSecondarySpec extends AnyFlatSpec with Matchers with ScalaFutures {
     doc.getString("mode").asString().getValue should be ("secondaryPreferred")
   }
 
-  "Mongo" should "have max staleness 10" in {
+  "Mongo" should "have max staleness 100" in {
     val doc = mongo.readPreference.toDocument
-    doc.getInt64("maxStalenessSeconds").asInt64().getValue should be (10)
+    doc.getInt64("maxStalenessSeconds").asInt64().getValue should be (100)
   }
 }
