@@ -47,7 +47,7 @@ class MongoDefaultsSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     doc.getInt64("maxStalenessSeconds").asInt64().getValue should be(90)
   }
 
-  "Mongo" should "use secondary if readPreference config specified wrong " in {
+  "Mongo" should "use secondary and max staleness 90 if readPreference config specified wrong " in {
     implicit val config: Config = ConfigFactory.parseString(
       s"""
          |mongo {
@@ -66,6 +66,7 @@ class MongoDefaultsSpec extends AnyFlatSpec with Matchers with ScalaFutures {
     val mongo: Mongo = new Mongo()
     val readPreference = mongo.readPreference.toDocument
     readPreference.getString("mode").asString().getValue should be("secondaryPreferred")
-    readPreference.getInt64("maxStalenessSeconds").asInt64().getValue should be(5)
+    // Config says 5 but values less than 90 are changed to 90
+    readPreference.getInt64("maxStalenessSeconds").asInt64().getValue should be(90)
   }
 }

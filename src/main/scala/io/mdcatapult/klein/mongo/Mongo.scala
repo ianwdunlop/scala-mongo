@@ -23,9 +23,9 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
   // By default it uses secondary with replication lag max of 90 seconds (the minimum that mongodb allows)
   val readPreference: ReadPreference = Try(config.getString("mongo.connection.readPreference")).getOrElse("secondaryPreferred") match {
-    case "secondaryPreferred" => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(90), TimeUnit.SECONDS)
+    case "secondaryPreferred" => ReadPreference.secondaryPreferred(getMaxStaleness(), TimeUnit.SECONDS)
     case "primaryPreferred" => ReadPreference.primaryPreferred()
-    case _ => ReadPreference.secondaryPreferred(Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(90), TimeUnit.SECONDS)
+    case _ => ReadPreference.secondaryPreferred(getMaxStaleness(), TimeUnit.SECONDS)
   }
   private val builder = MongoClientSettings.builder()
     .credential(credential)
@@ -64,5 +64,18 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
 
   def checkHealth(): Future[Boolean] = {
     mongoClient.listDatabaseNames().toFuture().map(_ => true).recover{case _ => false}
+  }
+
+  /**
+   * Get the max staleness config setting (in seconds) for secondary replication lag. It
+   * cannot be less than 90 seconds
+   *
+   * @return
+   */
+  def getMaxStaleness(): Long = {
+    Try(config.getLong("mongo.connection.maxStaleness")).getOrElse(90L) match {
+      case maxStaleness if maxStaleness >= 90 => maxStaleness
+      case maxStaleness if maxStaleness < 90 => 90
+    }
   }
 }
