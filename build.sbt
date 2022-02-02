@@ -31,6 +31,8 @@ lazy val root = (project in file("."))
       }
     },
     libraryDependencies ++= {
+      val kleinUtilVersion = "1.2.4-SNAPSHOT"
+
       val configVersion = "1.4.1"
       val scalaLoggingVersion = "3.9.4"
       val logbackClassicVersion = "1.2.10"
@@ -38,7 +40,6 @@ lazy val root = (project in file("."))
       val mongoVersion = "4.4.1"
       val nettyVersion = "4.1.73.Final"
       val scalaCollectionCompatVersion = "2.6.0"
-      val kleinUtilVersion = "1.2.4-SNAPSHOT"
 
       Seq(
         "io.mdcatapult.klein" %% "util" % kleinUtilVersion,
