@@ -49,7 +49,7 @@ publish-master:
   script:
     - cictl exec release sbt
   only:
-    - master
+    - main
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^Setting version to.*/
