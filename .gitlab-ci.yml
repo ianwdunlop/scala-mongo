@@ -31,7 +31,7 @@ test:
     MONGO_USERNAME: admin
     MONGO_PASSWORD: admin
   script:
-    - sbt +clean coverage +it:test coverageReport
+    - sbt +clean coverage it/test coverageReport
   coverage: /Coverage was \[\d+.\d+\%\]/
 
 publish-snapshot:

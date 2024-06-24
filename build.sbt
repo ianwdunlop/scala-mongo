@@ -1,25 +1,29 @@
-import com.gilcloud.sbt.gitlab.{GitlabCredentials,GitlabPlugin}
+val kleinUtilVersion = "1.2.7"
 
-GitlabPlugin.autoImport.gitlabGroupId     :=  Some(73679838)
-GitlabPlugin.autoImport.gitlabProjectId   :=  Some(50550924)
+val configVersion = "1.4.3"
+val scalaLoggingVersion = "3.9.5"
+val logbackClassicVersion = "1.5.6"
+val scalaTestVersion = "3.2.15"
+val mongoVersion = "4.4.1"
+val nettyVersion = "4.1.73.Final"
+val scalaCollectionCompatVersion = "2.12.0"
 
-GitlabPlugin.autoImport.gitlabCredentials  := {
-  sys.env.get("GITLAB_PRIVATE_TOKEN") match {
+lazy val creds = {
+  sys.env.get("CI_JOB_TOKEN") match {
     case Some(token) =>
-      Some(GitlabCredentials("Private-Token", token))
-    case None =>
-      Some(GitlabCredentials("Job-Token", sys.env.get("CI_JOB_TOKEN").get))
+      Credentials("GitLab Packages Registry", "gitlab.com", "gitlab-ci-token", token)
+    case _ =>
+      Credentials(Path.userHome / ".sbt" / ".credentials")
   }
 }
 
-lazy val scala_2_13 = "2.13.3"
+// Registry ID is the project ID of the project where the package is published, this should be set in the CI/CD environment
+val registryId = sys.env.get("REGISTRY_HOST_PROJECT_ID").getOrElse("")
 
-lazy val IntegrationTest = config("it") extend Test
+lazy val scala_2_13 = "2.13.14"
 
 lazy val root = (project in file("."))
-  .configs(IntegrationTest)
   .settings(
-    Defaults.itSettings,
     name                := "mongo",
     organization        := "io.mdcatapult.klein",
     scalaVersion        := scala_2_13,
@@ -33,26 +37,14 @@ lazy val root = (project in file("."))
       "-Xlint",
       "-Xfatal-warnings"),
     useCoursier := false,
-    resolvers += ("gitlab" at "https://gitlab.com/api/v4/projects/50550924/packages/maven"),
-    credentials += {
-      sys.env.get("GITLAB_PRIVATE_TOKEN") match {
-        case Some(token) =>
-          Credentials("GitLab Packages Registry", "gitlab.com", "Private-Token", token)
-        case None =>
-          Credentials("GitLab Packages Registry", "gitlab.com", "Job-Token", sys.env.get("CI_JOB_TOKEN").get)
-      }
+    resolvers ++= Seq(
+      "gitlab" at s"https://gitlab.com/api/v4/projects/$registryId/packages/maven",
+      "Maven Public" at "https://repo1.maven.org/maven2"),
+    publishTo := {
+      Some("gitlab" at s"https://gitlab.com/api/v4/projects/$registryId/packages/maven")
     },
+    credentials += creds,
     libraryDependencies ++= {
-      val kleinUtilVersion = "1.2.6"
-
-      val configVersion = "1.4.1"
-      val scalaLoggingVersion = "3.9.4"
-      val logbackClassicVersion = "1.2.10"
-      val scalaTestVersion = "3.2.15"
-      val mongoVersion = "4.4.1"
-      val nettyVersion = "4.1.73.Final"
-      val scalaCollectionCompatVersion = "2.6.0"
-
       Seq(
         "io.mdcatapult.klein" %% "util" % kleinUtilVersion,
 
@@ -66,3 +58,27 @@ lazy val root = (project in file("."))
       )
     }
   )
+
+Global / excludeLintKeys += Test / sourceDirectories
+
+lazy val it = project
+  .in(file("it"))  //it test located in a directory named "it"
+  .settings(
+    name := "mongo-it",
+    scalaVersion := "2.13.14",
+    Test / sourceDirectories ++= (root / Test / sourceDirectories).value,
+    libraryDependencies ++= {
+      Seq(
+        "io.mdcatapult.klein" %% "util" % kleinUtilVersion,
+
+        "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompatVersion,
+        "org.scalatest" %% "scalatest" % scalaTestVersion,
+        "org.mongodb.scala" %% "mongo-scala-driver" % mongoVersion,
+        "ch.qos.logback" % "logback-classic" % logbackClassicVersion,
+        "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
+        "com.typesafe" % "config" % configVersion,
+        "io.netty" % "netty-all" % nettyVersion
+      )
+    }
+  )
+  .dependsOn(root % "test->test;compile->compile")
