@@ -8,3 +8,4 @@ project/target
 /tmp
 /sbt-cache
 *.swp
+it/target
