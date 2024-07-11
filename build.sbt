@@ -32,6 +32,7 @@ lazy val root = (project in file("."))
     githubOwner := packageRepoOwner,
     githubRepository := sys.env.getOrElse("GITHUB_PACKAGE_REPO", "scala-packages"),
     resolvers += Resolver.githubPackages(packageRepoOwner),
+    releaseIgnoreUntrackedFiles := true,
     libraryDependencies ++= {
       Seq(
         "io.doclib" %% "common-util" % doclibUtilVersion,
