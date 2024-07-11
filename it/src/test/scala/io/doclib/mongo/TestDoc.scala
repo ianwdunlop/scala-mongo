@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.mdcatapult.klein.mongo
+package io.doclib.mongo
 
 import java.time.LocalDateTime
 import java.util.UUID

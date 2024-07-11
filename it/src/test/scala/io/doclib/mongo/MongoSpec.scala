@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.mdcatapult.klein.mongo
+package io.doclib.mongo
 
 import java.time.LocalDateTime.now
 import java.time.ZoneOffset.UTC
@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit.MILLIS
 import java.util.UUID.randomUUID
 
 import com.typesafe.config.{Config, ConfigFactory}
-import io.mdcatapult.klein.mongo.ResultConverters.toInsertionResult
+import ResultConverters.toInsertionResult
 import org.bson.UuidRepresentation
 import org.bson.codecs.UuidCodec
 import org.bson.codecs.configuration.CodecRegistries.{fromCodecs, fromProviders, fromRegistries}
