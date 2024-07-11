@@ -1,6 +1,6 @@
 ThisBuild / versionScheme := Some("early-semver")
 
-val kleinUtilVersion = "1.2.7"
+val doclibUtilVersion = "2.0.0"
 
 val configVersion = "1.4.3"
 val scalaLoggingVersion = "3.9.5"
@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
     resolvers += Resolver.githubPackages(packageRepoOwner),
     libraryDependencies ++= {
       Seq(
-        "io.doclib" %% "common-util" % kleinUtilVersion,
+        "io.doclib" %% "common-util" % doclibUtilVersion,
 
         "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompatVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
