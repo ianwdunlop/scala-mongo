@@ -21,6 +21,9 @@ You can change `mongo.connnection.readPreference` to `primaryPreferred` if you w
 docker-compose up -d
 sbt clean it:test
 ```
+## Publishing the package
+Uses the sbt plugin [sbt-github-packages](https://github.com/djspiewak/sbt-github-packages) to publish the package. Set the
+env vars `GITHUB_USERNAME`, `GITHUB_PACKAGE_REPO` & `GITHUB_TOKEN` to publish it.
 
-### License
+## License
 This project is licensed under the terms of the Apache 2 license, which can be found in the repository as `LICENSE.txt`
