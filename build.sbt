@@ -17,7 +17,7 @@ lazy val packageRepoOwner = sys.env.getOrElse("GITHUB_USERNAME", "")
 lazy val root = (project in file("."))
   .settings(
     name                := "mongo",
-    organization        := "io.mdcatapult.klein",
+    organization        := "io.doclib",
     scalaVersion        := scala_2_13,
     crossScalaVersions  := scala_2_13 :: Nil,
     scalacOptions ++= Seq(
