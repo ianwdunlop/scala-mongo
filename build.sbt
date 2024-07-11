@@ -1,26 +1,18 @@
+ThisBuild / versionScheme := Some("early-semver")
+
 val kleinUtilVersion = "1.2.7"
 
 val configVersion = "1.4.3"
 val scalaLoggingVersion = "3.9.5"
 val logbackClassicVersion = "1.5.6"
-val scalaTestVersion = "3.2.15"
-val mongoVersion = "4.4.1"
-val nettyVersion = "4.1.73.Final"
+val scalaTestVersion = "3.2.19"
+val mongoVersion = "4.11.1"
+val nettyVersion = "4.1.108.Final"
 val scalaCollectionCompatVersion = "2.12.0"
 
-lazy val creds = {
-  sys.env.get("CI_JOB_TOKEN") match {
-    case Some(token) =>
-      Credentials("GitLab Packages Registry", "gitlab.com", "gitlab-ci-token", token)
-    case _ =>
-      Credentials(Path.userHome / ".sbt" / ".credentials")
-  }
-}
-
-// Registry ID is the project ID of the project where the package is published, this should be set in the CI/CD environment
-val registryId = sys.env.get("REGISTRY_HOST_PROJECT_ID").getOrElse("")
-
 lazy val scala_2_13 = "2.13.14"
+
+lazy val packageRepoOwner = sys.env.getOrElse("GITHUB_USERNAME", "")
 
 lazy val root = (project in file("."))
   .settings(
@@ -37,16 +29,12 @@ lazy val root = (project in file("."))
       "-Xlint",
       "-Xfatal-warnings"),
     useCoursier := false,
-    resolvers ++= Seq(
-      "gitlab" at s"https://gitlab.com/api/v4/projects/$registryId/packages/maven",
-      "Maven Public" at "https://repo1.maven.org/maven2"),
-    publishTo := {
-      Some("gitlab" at s"https://gitlab.com/api/v4/projects/$registryId/packages/maven")
-    },
-    credentials += creds,
+    githubOwner := packageRepoOwner,
+    githubRepository := sys.env.getOrElse("GITHUB_PACKAGE_REPO", "scala-packages"),
+    resolvers += Resolver.githubPackages(packageRepoOwner),
     libraryDependencies ++= {
       Seq(
-        "io.mdcatapult.klein" %% "util" % kleinUtilVersion,
+        "io.doclib" %% "common-util" % kleinUtilVersion,
 
         "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompatVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
@@ -69,8 +57,6 @@ lazy val it = project
     Test / sourceDirectories ++= (root / Test / sourceDirectories).value,
     libraryDependencies ++= {
       Seq(
-        "io.mdcatapult.klein" %% "util" % kleinUtilVersion,
-
         "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompatVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion,
         "org.mongodb.scala" %% "mongo-scala-driver" % mongoVersion,
@@ -81,4 +67,4 @@ lazy val it = project
       )
     }
   )
-  .dependsOn(root % "test->test;compile->compile")
+  .dependsOn(root % "compile->compile")

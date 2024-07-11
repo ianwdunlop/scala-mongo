@@ -16,7 +16,7 @@
 
 package io.mdcatapult.klein.mongo
 
-import io.mdcatapult.util.models.result._
+import io.doclib.util.models.result._
 import org.mongodb.scala.result.{DeleteResult, InsertManyResult, InsertOneResult, UpdateResult}
 
 /**

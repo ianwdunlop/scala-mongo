@@ -20,7 +20,7 @@ import com.mongodb.{MongoClientSettings, ReadPreference}
 import com.typesafe.config.Config
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala._
-import org.mongodb.scala.connection.{ClusterSettings, NettyStreamFactoryFactory}
+import org.mongodb.scala.connection.{ClusterSettings, TransportSettings}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +61,7 @@ class Mongo()(implicit config: Config, codecs: CodecRegistry = MongoClient.DEFAU
     val isEnabled = config.hasPath(enableFlag) && config.getBoolean(enableFlag)
 
     if (isEnabled)
-      builder.streamFactoryFactory(NettyStreamFactoryFactory())
+      builder.transportSettings(TransportSettings.nettyBuilder().build())
         .applyToSslSettings(b => b.enabled(true))
     else
       builder
